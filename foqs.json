@@ -1,5 +1,12 @@
 [
     {
+  "hola": "Hola! Benvingut al xatbot del Portfoli Digital. Com et puc ajudar?",
+  "adeu": "Adéu! Gràcies per la teva visita. Que tinguis un bon dia!",
+  "estudis": "Estic cursant el cicle SMX (Sistemes Microinformàtics i Xarxes).",
+  "projectes": "Pots veure els meus projectes de FrontEnd i BackEnd en aquesta mateixa web.",
+  "defecte": "Ho sento, encara estic aprenent i no tinc una resposta per a aquesta consulta. Prova de preguntar sobre 'estudis' o 'projectes'."
+}
+    {
         "id": 1,
         "pregunta": "¿Cómo me conecto a la red?",
         "respuesta": "Configura tu ordenador en modo DHCP (IP automática)."
