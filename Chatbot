@@ -1,0 +1,55 @@
+!pip install -q -U google-generativeai flask flask-cors pyngrok
+
+import google.generativeai as genai
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+from pyngrok import ngrok
+
+# --- CONFIGURACIÓ ---
+GEMINI_API_KEY = "AIzaSyCY2xRNvRGVxDkCtsIdEQ3ogVS3UCIVHuU" # Posa la teva clau entre cometes
+NGROK_TOKEN = "3BNueGBPQljOfbu30KkBAGa82FP_4zbhChEWm5WYrfdTA3VW"    # Posa el teu token entre cometes
+genai.configure(api_key=GEMINI_API_KEY)
+
+# --- BUSCADOR DE MODELS ---
+# Això buscarà quin nom de model "flash" està disponible al teu compte
+model_name = 'gemini-1.5-flash'
+try:
+    for m in genai.list_models():
+        if 'generateContent' in m.supported_generation_methods and 'flash' in m.name:
+            model_name = m.name
+            break
+    print(f"✅ Utilitzant el model: {model_name}")
+except:
+    print("⚠️ No s'ha pogut llistar models, provant el nom per defecte...")
+
+# --- CONTEXT DEL BOT ---
+instruccions = """
+Ets l'assistent de la LAN PARTY de Castellbisbal.
+Info: 48 hores, 80 places, lloc: Aparcament Els Costals.
+Respon sempre en català i estil gamer.
+"""
+
+model = genai.GenerativeModel(model_name=model_name, system_instruction=instruccions)
+chat = model.start_chat(history=[])
+
+# --- SERVIDOR FLASK ---
+app = Flask(__name__)
+CORS(app)
+
+@app.route('/chat', methods=['POST'])
+def get_chat_response():
+    try:
+        user_input = request.json.get("message")
+        response = chat.send_message(user_input)
+        return jsonify({"reply": response.text})
+    except Exception as e:
+        return jsonify({"reply": f"Error: {str(e)}"}), 500
+
+# --- NGROK ---
+ngrok.kill()
+ngrok.set_auth_token(NGROK_TOKEN)
+public_url = ngrok.connect(5000).public_url
+print(f"\n🚀 BACKEND ACTIU!")
+print(f"🔗 URL per al teu HTML: {public_url}")
+
+app.run(port=5000)
